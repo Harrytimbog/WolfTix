@@ -35,6 +35,12 @@ app.all("*", () => {
 app.use(errorHandler);
 
 const start = async () => {
+  // Check if the JWT_KEY is defined in the environment variables before starting the server
+  // this environment variable is set in the auth-depl.yaml file and is set on kubernetes
+  if (!process.env.JWT_KEY) {
+    throw new Error("JWT_KEY must be defined");
+  }
+
   try {
     await mongoose.connect("mongodb://auth-mongo-srv:27017/auth", {});
     console.log("Connected to MongoDB");
