@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { isJsxAttributes } from "typescript";
 
 // An interface that describe the properties that are required to create a new User
 
