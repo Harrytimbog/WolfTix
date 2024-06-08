@@ -19,7 +19,9 @@ app.use(json());
 
 // Disable the secure flag for the cookie session because this services might be needed
 // to be accessed from other services that are written in different languages
-app.use(cookieSession({ signed: false, secure: false }));
+app.use(
+  cookieSession({ signed: false, secure: process.env.NODE_ENV !== "test" })
+);
 
 // Route handlers
 app.use(currentUserRouter);
