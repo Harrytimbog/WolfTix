@@ -1,23 +1,29 @@
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
+import request from "supertest";
 import { app } from "../app";
 
-// Setup in-memory MongoDB
-let mongo: any;
+declare global {
+  var signin: () => Promise<string[]>;
+}
+
+let mongo: MongoMemoryServer;
 
 beforeAll(async () => {
-  // Set the JWT_KEY environment variable for testing
   process.env.JWT_KEY = "testkey";
-  mongo = await MongoMemoryServer.create();
-  const mongoUri = mongo.getUri();
 
-  await mongoose.connect(mongoUri, {});
+  try {
+    mongo = await MongoMemoryServer.create();
+    const mongoUri = mongo.getUri();
+    await mongoose.connect(mongoUri, {});
+  } catch (err) {
+    console.error("Failed to connect to in-memory MongoDB", err);
+    throw err;
+  }
 });
 
-// Setup Express server
 beforeEach(async () => {
-  // Clear all mocks
-
+  jest.clearAllMocks();
   const collections = await mongoose.connection.db.collections();
 
   for (let collection of collections) {
@@ -25,11 +31,35 @@ beforeEach(async () => {
   }
 });
 
-// Close the in-memory database
-
 afterAll(async () => {
-  if (mongo) {
+  try {
     await mongo.stop();
+    await mongoose.connection.close();
+  } catch (err) {
+    console.error("Error during MongoDB stop/connection close", err);
   }
-  await mongoose.connection.close();
 });
+
+// You can actually choose to write this helper function in a
+// separate file and import it here and anywhere you need it
+
+global.signin = async (): Promise<string[]> => {
+  const email = "test@test.com";
+  const password = "password";
+
+  const response = await request(app)
+    .post("/api/users/signup")
+    .send({
+      email,
+      password,
+    })
+    .expect(201);
+
+  const cookie = response.get("Set-Cookie");
+
+  if (!cookie) {
+    throw new Error("Authentication cookie not found");
+  }
+
+  return cookie;
+};
