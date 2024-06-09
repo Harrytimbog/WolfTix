@@ -1,7 +1,9 @@
 export default function Home() {
   return (
-    <main>
-      <h1>Hello Microservices with lone wolf</h1>
+    <main className="container mt-5">
+      <h1 className="text-center">
+        Hello Microservices: I need to go to RGU tomorrow
+      </h1>
     </main>
   );
 }
