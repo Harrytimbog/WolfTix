@@ -16,23 +16,34 @@ export default async function Home() {
 }
 
 export async function getUser() {
-  if (typeof window === "undefined") {
+  const GET = async (url) => {
+    const headersObj = {};
+
+    const headersList = headers().forEach((header, key) => {
+      headersObj[key] = header;
+    });
+
+    const res = await axios.get(url, { headers: headersObj }).catch((err) => {
+      console.log(err);
+    });
+    return res;
+  };
+
+  const onTheServer = typeof window === "undefined";
+
+  if (onTheServer) {
     // Reach our ingress-nginx-controller service from inside the client pod
     const serviceName =
       "http://ingress-nginx-controller.ingress-nginx.svc.cluster.local";
 
-    const { data } = await axios.get(`${serviceName}/api/users/currentUser`, {
-      headers: {
-        Host: "wolfticketing.dev",
-      },
-    });
+    const { data } = await GET(`${serviceName}/api/users/currentUser`);
 
     return data;
   } else {
     // We are on the browser
 
     // request can be made with a base url of ''
-    const { data } = await axios.get("/api/users/currentUser");
+    const { data } = await GET("/api/users/currentUser");
     return data;
   }
   return {};
