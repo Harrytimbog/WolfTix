@@ -6,12 +6,18 @@ import React from "react";
 export default async function Home() {
   // Get User
   const user = await getUser();
-  console.log(user);
+  // console.log(user);
   return (
     <main className="container mt-5">
       <h1 className="text-center">
         Hello Microservices: I need to go to RGU tomorrow
       </h1>
+
+      {user.currentUser ? (
+        <h4>You are signed in</h4>
+      ) : (
+        <h4>You are not signed in</h4>
+      )}
     </main>
   );
 }
@@ -31,6 +37,6 @@ export async function getUser() {
     return response.data;
   } catch (error) {
     console.error("Failed to fetch user data:", error);
-    return { userDetails: null };
+    return null;
   }
 }
