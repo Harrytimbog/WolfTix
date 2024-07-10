@@ -1,3 +1,4 @@
+import createServerAxios from "@/lib/buildAxiosServer";
 import axios from "axios";
 import { headers } from "next/headers";
 import React from "react";
@@ -16,35 +17,20 @@ export default async function Home() {
 }
 
 export async function getUser() {
-  const GET = async (url) => {
-    const headersObj = {};
+  const axiosServer = createServerAxios(); // Use the custom Axios instance
 
-    const headersList = headers().forEach((header, key) => {
-      headersObj[key] = header;
-    });
+  try {
+    // const url =
+    //   typeof window === "undefined"
+    //     ? "/api/users/currentUser" // Server-side URL, axios instance is already configured with baseURL
+    //     : "/api/users/currentUser"; // Client-side URL, relative because the same instance handles it.
 
-    const res = await axios.get(url, { headers: headersObj }).catch((err) => {
-      console.log(err);
-    });
-    return res;
-  };
-
-  const onTheServer = typeof window === "undefined";
-
-  if (onTheServer) {
-    // Reach our ingress-nginx-controller service from inside the client pod
-    const serviceName =
-      "http://ingress-nginx-controller.ingress-nginx.svc.cluster.local";
-
-    const { data } = await GET(`${serviceName}/api/users/currentUser`);
-
-    return data;
-  } else {
-    // We are on the browser
-
-    // request can be made with a base url of ''
-    const { data } = await GET("/api/users/currentUser");
-    return data;
+    // Since Next14 components are all server-side components
+    const url = "/api/users/currentUser";
+    const response = await axiosServer.get(url);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to fetch user data:", error);
+    return { userDetails: null };
   }
-  return {};
 }
