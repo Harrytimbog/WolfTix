@@ -14,7 +14,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   // let user = null;
 
-  // Immediately invoked async function to fetch user data
+  // // Immediately invoked async function to fetch user data
   // (async () => {
   //   user = await getUser();
   //   // console.log(user.currentUser.email); // Logs user data fetched server-side
