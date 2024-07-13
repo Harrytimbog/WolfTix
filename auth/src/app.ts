@@ -9,8 +9,7 @@ import { signoutRouter } from "./routes/signout";
 import { signupRouter } from "./routes/signup";
 
 // Middlewares
-import { errorHandler } from "./middlewares/error-handler";
-import { NotFoundError } from "./errors/not-found-error";
+import { errorHandler, NotFoundError } from "@clonedwolftickets/common";
 
 const app = express();
 // Trust the ingress-nginx proxy
