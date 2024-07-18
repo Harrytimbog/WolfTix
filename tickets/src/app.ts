@@ -3,8 +3,16 @@ import "express-async-errors";
 import { json } from "body-parser";
 import cookieSession from "cookie-session";
 
+// Routes
+
+import { createTicketRouter } from "./routes/new";
+
 // Middlewares
-import { errorHandler, NotFoundError } from "@clonedwolftickets/common";
+import {
+  errorHandler,
+  NotFoundError,
+  currentUser,
+} from "@clonedwolftickets/common";
 
 const app = express();
 // Trust the ingress-nginx proxy
@@ -18,6 +26,10 @@ app.use(
 );
 
 // Route handlers
+
+app.use(currentUser);
+
+app.use(createTicketRouter);
 
 app.all("*", () => {
   throw new NotFoundError();
