@@ -6,6 +6,7 @@ import cookieSession from "cookie-session";
 // Routes
 
 import { createTicketRouter } from "./routes/new";
+import { showTicketRouter } from "./routes/show";
 
 // Middlewares
 import {
@@ -31,6 +32,7 @@ app.use(
 app.use(currentUser);
 
 app.use(createTicketRouter);
+app.use(showTicketRouter);
 
 app.all("*", () => {
   throw new NotFoundError();
