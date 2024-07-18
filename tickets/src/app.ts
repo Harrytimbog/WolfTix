@@ -27,6 +27,7 @@ app.use(
 
 // Route handlers
 
+// set the current user property on the request object
 app.use(currentUser);
 
 app.use(createTicketRouter);

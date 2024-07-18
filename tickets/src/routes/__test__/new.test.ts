@@ -1,6 +1,7 @@
 import request from "supertest";
 import { app } from "../../app";
 import mongoose from "mongoose";
+import { Ticket } from "../../models/ticket";
 
 it("has a route handler listening to /api/tickets for post requests", async () => {
   const response = await request(app).post("/api/tickets").send({});
@@ -61,13 +62,24 @@ it("returns an error if an invalid price is provided", async () => {
 
 it("creates a ticket with valid inputs", async () => {
   // Add in a check to make sure a ticket was saved
-  
+
+  // Get all the tickets
+  let tickets = await Ticket.find({});
+  expect(tickets.length).toEqual(0);
+
+  const title = "alaskaaa";
   await request(app)
     .post("/api/tickets")
     .set("Cookie", global.signin())
     .send({
-      title: "alaskaaa",
+      title,
       price: 20,
     })
     .expect(201);
+
+  // Get all the tickets again and check if the ticket was saved
+  tickets = await Ticket.find({});
+  expect(tickets.length).toEqual(1);
+  expect(tickets[0].price).toEqual(20);
+  expect(tickets[0].title).toEqual(title);
 });
