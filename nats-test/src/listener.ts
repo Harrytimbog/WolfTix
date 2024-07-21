@@ -7,6 +7,7 @@ const startListener = async () => {
   const clientId = randomBytes(12).toString("hex");
   const durableName = `ticket-created-listener-${clientId}`;
   const inbox = `inbox-${clientId}`;
+  const queueGroupName = "orders-service-queue-group";
 
   const nc = await connect({
     servers: "nats://localhost:4222",
@@ -38,6 +39,7 @@ const startListener = async () => {
   opts.durable(durableName);
   opts.deliverTo(inbox); // Ensure deliver_subject is set
   opts.manualAck(); // Ensure manual acknowledgment is set
+  opts.queue(queueGroupName); // Set the queue group name
 
   // Subscribe to the stream using the push-based method
   const sub = await js.subscribe("ticket.created", opts);
