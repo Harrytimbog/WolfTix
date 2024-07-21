@@ -1,9 +1,17 @@
 import { connect, StringCodec, consumerOpts } from "nats";
+import { randomBytes } from "crypto";
 
 console.clear();
 
 const startListener = async () => {
-  const nc = await connect({ servers: "nats://localhost:4222" });
+  const clientId = randomBytes(12).toString("hex");
+  const durableName = `ticket-created-listener-${clientId}`;
+  const inbox = `inbox-${clientId}`;
+
+  const nc = await connect({
+    servers: "nats://localhost:4222",
+    name: `listener-${clientId}`,
+  });
 
   console.log("Listener connected to NATS");
 
@@ -27,7 +35,8 @@ const startListener = async () => {
   // Define consumer options
   const opts = consumerOpts();
   opts.ackExplicit();
-  opts.durable("ticket-created-listener");
+  opts.durable(durableName);
+  opts.deliverTo(inbox); // Ensure deliver_subject is set
   opts.manualAck(); // Ensure manual acknowledgment is set
 
   // Subscribe to the stream using the push-based method

@@ -5,6 +5,8 @@ console.clear();
 const startPublisher = async () => {
   const nc = await connect({ servers: "nats://localhost:4222" });
 
+  console.log("Publisher connected to NATS");
+
   // Create JetStream Manager
   const jsm = await nc.jetstreamManager();
 
