@@ -40,6 +40,7 @@ const startListener = async (): Promise<NatsConnection> => {
   opts.deliverTo(inbox); // Ensure deliver_subject is set
   opts.manualAck(); // Ensure manual acknowledgment is set
   opts.queue(queueGroupName); // Set the queue group name
+  opts.deliverNew(); // Deliver only new messages
 
   // Subscribe to the stream using the push-based method
   const sub = await js.subscribe("ticket.created", opts);
@@ -51,7 +52,7 @@ const startListener = async (): Promise<NatsConnection> => {
     eventCount++;
     const data = sc.decode(m.data);
     console.log(`Received event #${eventCount}, with data: ${data}`);
-    m.ack();
+    m.ack(); // acknowledge the message
   }
 
   // This part will only be reached when the loop is broken
