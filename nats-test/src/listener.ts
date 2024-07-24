@@ -1,9 +1,9 @@
-import { connect, StringCodec, consumerOpts } from "nats";
+import { connect, StringCodec, consumerOpts, NatsConnection } from "nats";
 import { randomBytes } from "crypto";
 
 console.clear();
 
-const startListener = async () => {
+const startListener = async (): Promise<NatsConnection> => {
   const clientId = randomBytes(12).toString("hex");
   const durableName = `ticket-created-listener-${clientId}`;
   const inbox = `inbox-${clientId}`;
@@ -14,7 +14,7 @@ const startListener = async () => {
     name: `listener-${clientId}`,
   });
 
-  console.log("Listener connected to NATS");
+  console.log(`Listener ${clientId} connected to NATS`);
 
   // Create JetStream Manager
   const jsm = await nc.jetstreamManager();
@@ -26,7 +26,7 @@ const startListener = async () => {
     const error = err as Error;
     if (!error.message.includes("stream name already in use")) {
       console.error(`Error adding stream: ${error.message}`);
-      return;
+      return nc;
     }
   }
 
@@ -45,16 +45,39 @@ const startListener = async () => {
   const sub = await js.subscribe("ticket.created", opts);
 
   const sc = StringCodec();
+  let eventCount = 0;
 
   for await (const m of sub) {
-    console.log(`Received message: ${sc.decode(m.data)}`);
+    eventCount++;
+    const data = sc.decode(m.data);
+    console.log(`Received event #${eventCount}, with data: ${data}`);
     m.ack();
   }
 
-  // Close the connection
+  // This part will only be reached when the loop is broken
+  console.log(`Listener ${clientId} shutting down gracefully.`);
   await nc.drain();
+
+  return nc;
 };
 
-startListener().catch((err) => {
-  console.error(`Error starting listener: ${err.message}`);
-});
+// Graceful shutdown on signals
+const handleShutdown = async (nc: NatsConnection) => {
+  try {
+    console.log("Shutting down listener gracefully...");
+    await nc.drain();
+    process.exit(0);
+  } catch (err) {
+    console.error("Error during shutdown:", err);
+    process.exit(1);
+  }
+};
+
+startListener()
+  .then((nc) => {
+    process.on("SIGINT", () => handleShutdown(nc));
+    process.on("SIGTERM", () => handleShutdown(nc));
+  })
+  .catch((err) => {
+    console.error(`Error starting listener: ${err.message}`);
+  });
