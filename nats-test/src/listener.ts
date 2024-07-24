@@ -1,14 +1,72 @@
-import { connect, StringCodec, consumerOpts, NatsConnection } from "nats";
+import {
+  connect,
+  StringCodec,
+  consumerOpts,
+  NatsConnection,
+  JetStreamSubscription,
+  JsMsg,
+} from "nats";
 import { randomBytes } from "crypto";
 
 console.clear();
 
-const startListener = async (): Promise<NatsConnection> => {
-  const clientId = randomBytes(12).toString("hex");
-  const durableName = `ticket-created-listener-${clientId}`;
-  const inbox = `inbox-${clientId}`;
-  const queueGroupName = "orders-service-queue-group";
+abstract class Listener {
+  abstract subject: string;
+  abstract queueGroupName: string;
+  abstract onMessage(data: any, msg: JsMsg): void;
+  private client: NatsConnection;
+  private subscription?: JetStreamSubscription;
 
+  constructor(client: NatsConnection) {
+    this.client = client;
+  }
+
+  subscriptionOptions() {
+    const opts = consumerOpts();
+    opts.ackExplicit();
+    opts.deliverNew(); // Deliver only new messages
+    opts.manualAck(); // Ensure manual acknowledgment is set
+    opts.durable(this.queueGroupName); // Set the durable name
+    opts.queue(this.queueGroupName); // Set the queue group name
+    opts.deliverTo(this.queueGroupName + "_subject"); // Set the deliver subject
+    return opts;
+  }
+
+  async listen() {
+    const js = this.client.jetstream();
+    this.subscription = await js.subscribe(
+      this.subject,
+      this.subscriptionOptions()
+    );
+
+    const sc = StringCodec();
+
+    for await (const msg of this.subscription) {
+      console.log(`Message received: ${this.subject} / ${this.queueGroupName}`);
+      const parsedData = this.parseMessage(msg);
+      this.onMessage(parsedData, msg);
+    }
+  }
+
+  parseMessage(msg: JsMsg) {
+    const data = msg.data;
+    return JSON.parse(new TextDecoder().decode(data));
+  }
+}
+
+// Concrete Listener Implementation
+class TicketCreatedListener extends Listener {
+  subject = "ticket.created";
+  queueGroupName = "orders-service-queue-group";
+
+  onMessage(data: any, msg: JsMsg) {
+    console.log(`Received event with data: ${JSON.stringify(data)}`);
+    msg.ack();
+  }
+}
+
+const startListener = async () => {
+  const clientId = randomBytes(12).toString("hex");
   const nc = await connect({
     servers: "nats://localhost:4222",
     name: `listener-${clientId}`,
@@ -16,48 +74,9 @@ const startListener = async (): Promise<NatsConnection> => {
 
   console.log(`Listener ${clientId} connected to NATS`);
 
-  // Create JetStream Manager
-  const jsm = await nc.jetstreamManager();
-
-  // Add a stream if it doesn't exist
-  try {
-    await jsm.streams.add({ name: "tickets", subjects: ["ticket.created"] });
-  } catch (err) {
-    const error = err as Error;
-    if (!error.message.includes("stream name already in use")) {
-      console.error(`Error adding stream: ${error.message}`);
-      return nc;
-    }
-  }
-
-  // Create a JetStream client
-  const js = nc.jetstream();
-
-  // Define consumer options
-  const opts = consumerOpts();
-  opts.ackExplicit();
-  opts.durable(durableName);
-  opts.deliverTo(inbox); // Ensure deliver_subject is set
-  opts.manualAck(); // Ensure manual acknowledgment is set
-  opts.queue(queueGroupName); // Set the queue group name
-  opts.deliverNew(); // Deliver only new messages
-
-  // Subscribe to the stream using the push-based method
-  const sub = await js.subscribe("ticket.created", opts);
-
-  const sc = StringCodec();
-  let eventCount = 0;
-
-  for await (const m of sub) {
-    eventCount++;
-    const data = sc.decode(m.data);
-    console.log(`Received event #${eventCount}, with data: ${data}`);
-    m.ack(); // acknowledge the message
-  }
-
-  // This part will only be reached when the loop is broken
-  console.log(`Listener ${clientId} shutting down gracefully.`);
-  await nc.drain();
+  // Initialize the concrete listener
+  const listener = new TicketCreatedListener(nc);
+  await listener.listen();
 
   return nc;
 };
