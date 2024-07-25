@@ -2,7 +2,7 @@ import { JsMsg } from "nats";
 import { Listener } from "./base-listener";
 
 export class TicketCreatedListener extends Listener {
-  subject = "ticket.created";
+  subject = "ticket:created";
   queueGroupName = "orders-service-queue-group";
 
   onMessage(data: any, msg: JsMsg) {
