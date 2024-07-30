@@ -1,4 +1,5 @@
 import { connect, StringCodec } from "nats";
+import { TicketCreatedPublisher } from "./events/ticket-created-publisher";
 
 console.clear();
 
@@ -17,12 +18,17 @@ const startPublisher = async () => {
   const js = nc.jetstream();
   const sc = StringCodec();
 
-  const data = JSON.stringify({ id: "123", title: "concert", price: 20 });
+  // const data = JSON.stringify({ id: "123", title: "concert", price: 20 });
+  const publisher = new TicketCreatedPublisher(nc);
+  try {
+    // Publish a message to the stream
+    await publisher.publish({ id: "123", title: "concert", price: 20 });
+    console.log("Message published");
+  } catch (error) {
+    console.log(error);
+  }
 
-  // Publish a message to the stream
-  await js.publish("ticket:created", sc.encode(data));
-
-  console.log("Message published");
+  // await js.publish("ticket:created", sc.encode(data));
 
   // Close the connection
   await nc.drain();
