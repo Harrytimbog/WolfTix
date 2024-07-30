@@ -22,7 +22,12 @@ const startPublisher = async () => {
   const publisher = new TicketCreatedPublisher(nc);
   try {
     // Publish a message to the stream
-    await publisher.publish({ id: "123", title: "concert", price: 20 });
+    await publisher.publish({
+      id: "123",
+      title: "concert",
+      price: 20,
+      userId: "123",
+    });
     console.log("Message published");
   } catch (error) {
     console.log(error);
