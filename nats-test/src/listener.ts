@@ -57,6 +57,7 @@ export class TicketCreatedListener extends Listener<{
   price: number;
 }> {
   subject = "clonedwolf.ticket:created";
+  // subject = "clonedwolf.ticket:updated";
   queueGroupName = "orders-service-queue-group";
 
   onMessage(data: { id: string; title: string; price: number }, msg: JsMsg) {

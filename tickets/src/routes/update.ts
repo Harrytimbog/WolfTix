@@ -6,6 +6,8 @@ import {
   NotFoundError,
   NotAuthorizedError,
 } from "@clonedwolftickets/common";
+import { TicketUpdatedPublisher } from "../events/publishers/ticket-updated-publisher";
+import { natsWrapper } from "../nats-wrapper";
 
 import { Ticket } from "../models/ticket";
 
@@ -38,6 +40,19 @@ router.put(
     });
 
     await ticket.save();
+
+    try {
+      // Ensure you're passing the JetStream client (jsClient) for publishing
+      // Publish an event for the ticket update
+      await new TicketUpdatedPublisher(natsWrapper.jsClient).publish({
+        id: ticket.id,
+        title: ticket.title,
+        price: ticket.price,
+        userId: ticket.userId,
+      });
+    } catch (err) {
+      console.error("Error publishing event:", err);
+    }
 
     res.send(ticket);
   }
