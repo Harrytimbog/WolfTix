@@ -31,7 +31,7 @@ router.put(
     if (ticket.userId !== req.currentUser!.id) {
       throw new NotAuthorizedError();
     }
-
+    // Update the ticket
     ticket.set({
       title: req.body.title,
       price: req.body.price,

@@ -1,27 +1,30 @@
-import { connect, StringCodec } from "nats";
+import { connect } from "nats";
 import { TicketCreatedPublisher } from "./events/ticket-created-publisher";
-
-console.clear();
 
 const startPublisher = async () => {
   const nc = await connect({ servers: "nats://localhost:4222" });
-
   console.log("Publisher connected to NATS");
 
-  // Create JetStream Manager
   const jsm = await nc.jetstreamManager();
 
-  // Add a stream if it doesn't exist
-  await jsm.streams.add({ name: "tickets", subjects: ["ticket:created"] });
-
-  // Create a JetStream client
-  const js = nc.jetstream();
-  const sc = StringCodec();
-
-  // const data = JSON.stringify({ id: "123", title: "concert", price: 20 });
-  const publisher = new TicketCreatedPublisher(nc);
+  // Ensure that the stream exists
   try {
-    // Publish a message to the stream
+    const streamInfo = await jsm.streams.info("tickets");
+    console.log("Stream 'tickets' exists:", streamInfo);
+  } catch (err) {
+    // If the stream does not exist, create it
+    await jsm.streams.add({
+      name: "tickets",
+      subjects: ["clonedwolf.ticket:created"],
+    });
+    console.log("Stream 'tickets' created.");
+  }
+
+  // Create a JetStream client and publish a message
+  const js = nc.jetstream();
+  const publisher = new TicketCreatedPublisher(js);
+
+  try {
     await publisher.publish({
       id: "123",
       title: "concert",
@@ -30,10 +33,8 @@ const startPublisher = async () => {
     });
     console.log("Message published");
   } catch (error) {
-    console.log(error);
+    console.error("Error publishing message:", error);
   }
-
-  // await js.publish("ticket:created", sc.encode(data));
 
   // Close the connection
   await nc.drain();

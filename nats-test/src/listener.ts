@@ -1,52 +1,88 @@
 import {
-  connect,
-  StringCodec,
-  consumerOpts,
   NatsConnection,
+  consumerOpts,
   JetStreamSubscription,
+  StringCodec,
   JsMsg,
+  connect,
+  JetStreamClient,
 } from "nats";
 import { randomBytes } from "crypto";
-import { TicketCreatedListener } from "./events/ticket-created-listener";
 
-console.clear();
+// Abstract Listener class for handling JetStream message consumption
+export abstract class Listener<T> {
+  abstract subject: string;
+  abstract queueGroupName: string;
+  abstract onMessage(data: T, msg: JsMsg): void;
 
+  protected client: NatsConnection;
+  protected jsClient: JetStreamClient;
+  protected subscription?: JetStreamSubscription;
 
-// Concrete Listener Implementation
+  constructor(client: NatsConnection) {
+    this.client = client;
+    this.jsClient = this.client.jetstream();
+  }
 
+  async listen() {
+    const opts = consumerOpts();
+    opts.ackExplicit(); // Require explicit acknowledgment of messages
+    opts.manualAck(); // Ensure manual acknowledgment
+    opts.queue(this.queueGroupName); // Set queue group for load balancing
+    opts.durable(this.queueGroupName); // Use a durable name to persist state
+    opts.deliverTo(`inbox-${randomBytes(12).toString("hex")}`); // Set an inbox for delivery
+
+    // Subscribe to the subject using JetStream's subscription system
+    this.subscription = await this.jsClient.subscribe(this.subject, opts);
+
+    console.log(
+      `Listening on subject: ${this.subject}, queue group: ${this.queueGroupName}`
+    );
+
+    const sc = StringCodec();
+    for await (const msg of this.subscription) {
+      const parsedData = JSON.parse(sc.decode(msg.data));
+      console.log(`Received message on subject: ${this.subject}`);
+
+      this.onMessage(parsedData, msg);
+      msg.ack();
+    }
+  }
+}
+
+// Concrete Listener Implementation for TicketCreatedEvent
+export class TicketCreatedListener extends Listener<{
+  id: string;
+  title: string;
+  price: number;
+}> {
+  subject = "clonedwolf.ticket:created";
+  queueGroupName = "orders-service-queue-group";
+
+  onMessage(data: { id: string; title: string; price: number }, msg: JsMsg) {
+    console.log("Event data:", data);
+  }
+}
+
+// Start the listener
 const startListener = async () => {
-  const clientId = randomBytes(12).toString("hex");
-  const nc = await connect({
-    servers: "nats://localhost:4222",
-    name: `listener-${clientId}`,
-  });
+  const nc = await connect({ servers: "nats://localhost:4222" });
+  console.log("Listener connected to NATS");
 
-  console.log(`Listener ${clientId} connected to NATS`);
-
-  // Initialize the concrete listener
   const listener = new TicketCreatedListener(nc);
   await listener.listen();
 
-  return nc;
-};
-
-// Graceful shutdown on signals
-const handleShutdown = async (nc: NatsConnection) => {
-  try {
-    console.log("Shutting down listener gracefully...");
+  // Graceful shutdown on SIGINT/SIGTERM signals
+  const handleShutdown = async () => {
+    console.log("Shutting down listener...");
     await nc.drain();
     process.exit(0);
-  } catch (err) {
-    console.error("Error during shutdown:", err);
-    process.exit(1);
-  }
+  };
+
+  process.on("SIGINT", handleShutdown);
+  process.on("SIGTERM", handleShutdown);
 };
 
-startListener()
-  .then((nc) => {
-    process.on("SIGINT", () => handleShutdown(nc));
-    process.on("SIGTERM", () => handleShutdown(nc));
-  })
-  .catch((err) => {
-    console.error(`Error starting listener: ${err.message}`);
-  });
+startListener().catch((err) => {
+  console.error(`Error starting listener: ${err.message}`);
+});
