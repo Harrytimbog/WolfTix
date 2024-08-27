@@ -1,7 +1,5 @@
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
-import request from "supertest";
-import { app } from "../app";
 import jwt from "jsonwebtoken";
 
 declare global {
@@ -14,8 +12,13 @@ beforeAll(async () => {
   process.env.JWT_KEY = "testkey";
 
   try {
-    mongo = await MongoMemoryServer.create();
+    mongo = await MongoMemoryServer.create({
+      binary: {
+        version: "6.0.4",
+      },
+    });
     const mongoUri = mongo.getUri();
+
     await mongoose.connect(mongoUri, {});
   } catch (err) {
     console.error("Failed to connect to in-memory MongoDB", err);
@@ -41,29 +44,17 @@ afterAll(async () => {
   }
 });
 
-// You can actually choose to write this helper function in a
-// separate file and import it here and anywhere you need it
-
+// JWT helper function for authentication
 global.signin = () => {
-  // Build a JWT payload. { id, email }
   const payload = {
     id: new mongoose.Types.ObjectId().toHexString(),
     email: "test@gmail.com",
   };
-  // Create the JWT!
 
   const token = jwt.sign(payload, process.env.JWT_KEY!);
-  // Build session Object. { jwt: MY_JWT }
-
   const session = { jwt: token };
-  // Turn that session into JSON
   const sessionJSON = JSON.stringify(session);
-
-  // Take JSON and encode it as base64
-
   const base64 = Buffer.from(sessionJSON).toString("base64");
-
-  // return a string thats the cookie with the encoded data // return [`session=${base64}`];
 
   return [`session=${base64}`];
 };

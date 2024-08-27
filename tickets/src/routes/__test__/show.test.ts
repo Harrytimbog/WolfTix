@@ -2,6 +2,20 @@ import request from "supertest";
 import { app } from "../../app";
 import mongoose from "mongoose";
 
+// Mock natsWrapper in your tests
+jest.mock("../../nats-wrapper", () => {
+  return {
+    natsWrapper: {
+      jsClient: {
+        publish: jest.fn().mockImplementation(() => {
+          return Promise.resolve();
+        }),
+      },
+      connect: jest.fn(),
+    },
+  };
+});
+
 it("returns a 404 if the ticket is not found", async () => {
   // generate an id for testing
   const id = new mongoose.Types.ObjectId().toHexString();

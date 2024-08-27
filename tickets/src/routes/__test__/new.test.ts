@@ -3,6 +3,20 @@ import { app } from "../../app";
 import mongoose from "mongoose";
 import { Ticket } from "../../models/ticket";
 
+// Mock natsWrapper in your tests
+jest.mock("../../nats-wrapper", () => {
+  return {
+    natsWrapper: {
+      jsClient: {
+        publish: jest.fn().mockImplementation(() => {
+          return Promise.resolve();
+        }),
+      },
+      connect: jest.fn(),
+    },
+  };
+});
+
 it("has a route handler listening to /api/tickets for post requests", async () => {
   const response = await request(app).post("/api/tickets").send({});
   expect(response.status).not.toEqual(404);

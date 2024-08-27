@@ -2,6 +2,20 @@ import request from "supertest";
 
 import { app } from "../../app";
 
+// Mock natsWrapper in your tests
+jest.mock("../../nats-wrapper", () => {
+  return {
+    natsWrapper: {
+      jsClient: {
+        publish: jest.fn().mockImplementation(() => {
+          return Promise.resolve();
+        }),
+      },
+      connect: jest.fn(),
+    },
+  };
+});
+
 it("can fetch a list of tickets", async () => {
   await request(app)
     .post("/api/tickets")
