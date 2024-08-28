@@ -126,5 +126,9 @@ it("publishes an event", async () => {
     })
     .expect(200);
 
-  expect(natsWrapper.client.publish).toHaveBeenCalled();
+  // Assert that publish was called
+  expect(natsWrapper.jsClient.publish).toHaveBeenCalled();
+
+  // Log the arguments if needed for debugging
+  // console.log(natsWrapper.jsClient.publish.mock.calls);
 });
