@@ -5,17 +5,16 @@ import cookieSession from "cookie-session";
 
 // Routes
 
-import { createTicketRouter } from "./routes/new";
-import { showTicketRouter } from "./routes/show";
-import { indexTicketRouter } from "./routes";
-import { updateTicketRouter } from "./routes/update";
-
 // Middlewares
 import {
   errorHandler,
   NotFoundError,
   currentUser,
 } from "@clonedwolftickets/common";
+import { deleteOrderRouter } from "./routes/delete";
+import { showOrderRouter } from "./routes/show";
+import { indexOrderRouter } from "./routes";
+import { newOrderRouter } from "./routes/new";
 
 const app = express();
 // Trust the ingress-nginx proxy
@@ -33,10 +32,10 @@ app.use(
 // set the current user property on the request object
 app.use(currentUser);
 
-app.use(createTicketRouter);
-app.use(showTicketRouter);
-app.use(indexTicketRouter);
-app.use(updateTicketRouter);
+app.use(deleteOrderRouter);
+app.use(indexOrderRouter);
+app.use(newOrderRouter);
+app.use(showOrderRouter);
 
 app.all("*", () => {
   throw new NotFoundError();
