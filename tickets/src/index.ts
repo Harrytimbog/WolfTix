@@ -25,7 +25,7 @@ const start = async () => {
 
   try {
     // Connect to the NATS streaming server
-    await natsWrapper.connect("nats://nats-srv:4222");
+    await natsWrapper.connect(process.env.NATS_URL);
 
     // Connect to MongoDB
     await mongoose.connect(process.env.MONGO_URI, {});
