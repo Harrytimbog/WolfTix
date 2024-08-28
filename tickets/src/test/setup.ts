@@ -6,6 +6,20 @@ declare global {
   var signin: () => string[];
 }
 
+// Mock natsWrapper in your tests
+jest.mock("../nats-wrapper.ts", () => {
+  return {
+    natsWrapper: {
+      jsClient: {
+        publish: jest.fn().mockImplementation(() => {
+          return Promise.resolve();
+        }),
+      },
+      connect: jest.fn(),
+    },
+  };
+});
+
 let mongo: MongoMemoryServer;
 
 beforeAll(async () => {
