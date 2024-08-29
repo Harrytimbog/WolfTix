@@ -5,7 +5,7 @@ import {
   requireAuth,
 } from "@clonedwolftickets/common";
 import { Order, OrderStatus } from "../models/order";
-import { OrderCalledPublisher } from "../events/publishers/order-cancelled-publisher";
+import { OrderCancelledPublisher } from "../events/publishers/order-cancelled-publisher";
 import { natsWrapper } from "../nats-wrapper";
 
 const router = express.Router();
@@ -27,7 +27,7 @@ router.delete(
     await order.save();
 
     // Publish an event saying this was cancelled!
-    await new OrderCalledPublisher(natsWrapper.jsClient).publish({
+    await new OrderCancelledPublisher(natsWrapper.jsClient).publish({
       id: order.id,
       ticket: {
         id: order.ticket.id,
