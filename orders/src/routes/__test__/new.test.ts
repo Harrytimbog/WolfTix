@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
 import request from "supertest";
 import { app } from "../../app";
-import { Order, OrderStatus } from "../../models/order";
+import { Order } from "../../models/order";
 import { Ticket } from "../../models/ticket";
 import { natsWrapper } from "../../nats-wrapper";
+import { OrderStatus } from "@clonedwolftickets/common";
 
 // Asserts ticket does not exist
 it("returns an error if the ticket does not exist", async () => {

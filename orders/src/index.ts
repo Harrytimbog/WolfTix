@@ -27,11 +27,19 @@ const start = async () => {
 
   try {
     // Connect to the NATS streaming server
-    await natsWrapper.connect("nats://nats-srv:4222");
+    await natsWrapper.connect(process.env.NATS_URL);
+
+    // Graceful shutdown handling
+    process.on("SIGINT", () => natsWrapper.close());
+    process.on("SIGTERM", () => natsWrapper.close());
+
+    // Initialize listeners
+    new TicketCreatedListener(natsWrapper.jsClient).listen();
+    new TicketUpdatedListener(natsWrapper.jsClient).listen();
 
     // Connect to MongoDB
     await mongoose.connect(process.env.MONGO_URI, {});
-    console.log("Connected to MongoDB for tickets service");
+    console.log("Connected to MongoDB for orders service");
 
     // Start listening for incoming requests
     app.listen(3000, () => {
@@ -40,22 +48,6 @@ const start = async () => {
   } catch (err) {
     console.error(err);
   }
-
-  // Graceful shutdown handling
-  process.on("SIGINT", async () => {
-    console.log("SIGINT signal received: closing NATS connection...");
-    await natsWrapper.close();
-    process.exit();
-  });
-
-  new TicketCreatedListener(natsWrapper.jsClient).listen();
-  new TicketUpdatedListener(natsWrapper.jsClient).listen();
-
-  process.on("SIGTERM", async () => {
-    console.log("SIGTERM signal received: closing NATS connection...");
-    await natsWrapper.close();
-    process.exit();
-  });
 };
 
 start();

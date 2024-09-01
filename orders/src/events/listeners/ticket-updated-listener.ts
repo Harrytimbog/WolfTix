@@ -8,8 +8,8 @@ import { Ticket } from "../../models/ticket";
 import { queueGroupName } from "./queue-group-name";
 
 export class TicketUpdatedListener extends Listener<TicketUpdatedEvent> {
-  readonly subject: Subjects.TicketUpdated = Subjects.TicketUpdated;
-  readonly queueGroupName: string = queueGroupName;
+  readonly subject = Subjects.TicketUpdated;
+  readonly queueGroupName: string = `${queueGroupName}-ticket-updated`;
 
   async onMessage(data: TicketUpdatedEvent["data"], msg: JsMsg) {
     const { id, title, price } = data;

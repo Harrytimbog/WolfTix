@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
-import { Order, OrderStatus } from "./order";
+import { Order } from "./order";
+import { OrderStatus } from "@clonedwolftickets/common";
 
 interface TicketAttrs {
   id: string;

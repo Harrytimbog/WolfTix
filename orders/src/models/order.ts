@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
-import { OrderStatus } from "@clonedwolftickets/common";
 import { TicketDoc } from "./ticket";
-export { OrderStatus };
+import { OrderStatus } from "@clonedwolftickets/common";
 
 // An interface that describes the properties that are required to create a new Order
 interface OrderAttrs {

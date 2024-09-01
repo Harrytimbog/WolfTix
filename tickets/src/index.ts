@@ -27,6 +27,10 @@ const start = async () => {
     // Connect to the NATS streaming server
     await natsWrapper.connect(process.env.NATS_URL);
 
+    // Graceful shutdown handling
+    process.on("SIGINT", () => natsWrapper.close());
+    process.on("SIGTERM", () => natsWrapper.close());
+
     // Connect to MongoDB
     await mongoose.connect(process.env.MONGO_URI, {});
     console.log("Connected to MongoDB for tickets service");
@@ -38,19 +42,6 @@ const start = async () => {
   } catch (err) {
     console.error(err);
   }
-
-  // Graceful shutdown handling
-  process.on("SIGINT", async () => {
-    console.log("SIGINT signal received: closing NATS connection...");
-    await natsWrapper.close();
-    process.exit();
-  });
-
-  process.on("SIGTERM", async () => {
-    console.log("SIGTERM signal received: closing NATS connection...");
-    await natsWrapper.close();
-    process.exit();
-  });
 };
 
 start();
