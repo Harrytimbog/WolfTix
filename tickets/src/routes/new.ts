@@ -33,6 +33,7 @@ router.post(
         title: ticket.title,
         price: ticket.price,
         userId: ticket.userId,
+        version: ticket.version,
       });
     } catch (err) {
       console.error("Error publishing event:", err);
