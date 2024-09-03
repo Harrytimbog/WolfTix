@@ -33,6 +33,7 @@ router.put(
     if (ticket.userId !== req.currentUser!.id) {
       throw new NotAuthorizedError();
     }
+
     // Update the ticket
     ticket.set({
       title: req.body.title,
@@ -42,15 +43,17 @@ router.put(
     await ticket.save();
 
     try {
-      // Ensure you're passing the JetStream client (jsClient) for publishing
-      // Publish an event for the ticket update
-      await new TicketUpdatedPublisher(natsWrapper.jsClient).publish({
+      // TypeScript workaround to include 'version' in the object
+      const eventData = {
         id: ticket.id,
         title: ticket.title,
         price: ticket.price,
         userId: ticket.userId,
         version: ticket.version,
-      });
+      };
+
+      // Publish an event for the ticket update
+      await new TicketUpdatedPublisher(natsWrapper.jsClient).publish(eventData);
     } catch (err) {
       console.error("Error publishing event:", err);
     }

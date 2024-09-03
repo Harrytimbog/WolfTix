@@ -7,15 +7,15 @@ interface TicketAttrs {
   userId: string;
 }
 
+interface TicketModel extends mongoose.Model<TicketDoc> {
+  build(attr: TicketAttrs): TicketDoc;
+}
+
 interface TicketDoc extends mongoose.Document {
   title: string;
   price: number;
   userId: string;
   version: number;
-}
-
-interface TicketModel extends mongoose.Model<TicketDoc> {
-  build(attrs: TicketAttrs): TicketDoc;
 }
 
 const ticketSchema = new mongoose.Schema(
@@ -43,13 +43,15 @@ const ticketSchema = new mongoose.Schema(
   }
 );
 
-// Add the version field to the schema
 ticketSchema.set("versionKey", "version");
 ticketSchema.plugin(updateIfCurrentPlugin);
 
-// Define a static method on the schema to create a new ticket
-ticketSchema.statics.build = (attrs: TicketAttrs) => {
-  return new Ticket(attrs);
+ticketSchema.statics.build = (ticketAttribues: TicketAttrs) => {
+  return new Ticket({
+    title: ticketAttribues.title,
+    price: ticketAttribues.price,
+    userId: ticketAttribues.userId,
+  });
 };
 
 const Ticket = mongoose.model<TicketDoc, TicketModel>("Ticket", ticketSchema);

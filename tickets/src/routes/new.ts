@@ -27,14 +27,16 @@ router.post(
     await ticket.save();
 
     try {
-      // Ensure you're passing the JetStream client (jsClient) for publishing
-      await new TicketCreatedPublisher(natsWrapper.jsClient).publish({
+      // TypeScript workaround to include 'version' in the object
+      const eventData = {
         id: ticket.id,
         title: ticket.title,
         price: ticket.price,
         userId: ticket.userId,
         version: ticket.version,
-      });
+      };
+
+      await new TicketCreatedPublisher(natsWrapper.jsClient).publish(eventData);
     } catch (err) {
       console.error("Error publishing event:", err);
     }
