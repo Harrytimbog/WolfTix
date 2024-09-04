@@ -1,10 +1,9 @@
 import { OrderCreatedListener } from "../order-created-listener";
-import { Ticket } from "../../models/ticket";
-import { natsWrapper } from "../../nats-wrapper";
 import { OrderCreatedEvent, OrderStatus } from "@clonedwolftickets/common";
 import mongoose from "mongoose";
 import { JsMsg } from "nats";
-import { TicketUpdatedPublisher } from "../../events/publishers/ticket-updated-publisher";
+import { natsWrapper } from "../../../nats-wrapper";
+import { Ticket } from "../../../models/ticket";
 
 const setup = async () => {
   // Create an instance of the listener

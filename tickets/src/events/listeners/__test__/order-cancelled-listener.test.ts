@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 import { OrderCancelledEvent } from "@clonedwolftickets/common";
-import { natsWrapper } from "../../nats-wrapper";
-import { OrderCancelledEventListener } from "../order-cancelled-listener";
-import { Ticket } from "../../models/ticket";
+import { natsWrapper } from "../../../nats-wrapper";
+import { Ticket } from "../../../models/ticket";
+import { OrderCancelledListener } from "../order-cancelled-listener";
 
 const setup = async () => {
-  const listener = new OrderCancelledEventListener(natsWrapper.jsClient); // remember the natswrapper imported is the mock
+  const listener = new OrderCancelledListener(natsWrapper.jsClient); // remember the natswrapper imported is the mock
 
   const ticket = Ticket.build({
     title: "concert",

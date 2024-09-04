@@ -1,32 +1,29 @@
 import {
   Listener,
-  OrderCancelledEvent,
+  OrderCreatedEvent,
   Subjects,
 } from "@clonedwolftickets/common";
-import { queueGroupName } from "./queue-group-name";
 import { JsMsg } from "nats";
-import { Ticket } from "../models/ticket";
-import { TicketUpdatedPublisher } from "../events/publishers/ticket-updated-publisher";
+import { Ticket } from "../../models/ticket";
+import { TicketUpdatedPublisher } from "../publishers/ticket-updated-publisher";
 
-export class OrderCancelledEventListener extends Listener<OrderCancelledEvent> {
-  readonly subject: Subjects.OrderCancelled = Subjects.OrderCancelled;
-  queueGroupName = queueGroupName;
+export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
+  subject: Subjects.OrderCreated = Subjects.OrderCreated;
+  queueGroupName = "tickets-service";
 
-  async onMessage(data: OrderCancelledEvent["data"], msg: JsMsg) {
-    // Find the ticket that the order is cancelling
+  async onMessage(data: OrderCreatedEvent["data"], msg: JsMsg) {
+    // Find the ticket that the order is reserving
     const ticket = await Ticket.findById(data.ticket.id);
-
     // If no ticket, throw error
     if (!ticket) {
       throw new Error("Ticket not found");
     }
 
     // Mark the ticket as being reserved by setting its orderId property
-    ticket.set({ orderId: undefined });
+    ticket.set({ orderId: data.id });
 
+    // Save the ticket
     await ticket.save();
-
-    // Publish the ticket updated event
     await new TicketUpdatedPublisher(this.jsClient).publish({
       id: ticket.id,
       version: ticket.version,
@@ -37,6 +34,7 @@ export class OrderCancelledEventListener extends Listener<OrderCancelledEvent> {
     });
 
     // Ack the message
+
     msg.ack();
   }
 }
