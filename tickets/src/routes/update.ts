@@ -5,6 +5,7 @@ import {
   validateRequest,
   NotFoundError,
   NotAuthorizedError,
+  BadRequestError,
 } from "@clonedwolftickets/common";
 import { TicketUpdatedPublisher } from "../events/publishers/ticket-updated-publisher";
 import { natsWrapper } from "../nats-wrapper";
@@ -28,6 +29,11 @@ router.put(
 
     if (!ticket) {
       throw new NotFoundError();
+    }
+
+    // this is to prevent editing a ticket that is already reserved
+    if (ticket.orderId) {
+      throw new BadRequestError("Cannot edit a reserved ticket");
     }
 
     if (ticket.userId !== req.currentUser!.id) {
