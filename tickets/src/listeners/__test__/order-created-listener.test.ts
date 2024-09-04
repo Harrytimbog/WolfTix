@@ -4,6 +4,7 @@ import { natsWrapper } from "../../nats-wrapper";
 import { OrderCreatedEvent, OrderStatus } from "@clonedwolftickets/common";
 import mongoose from "mongoose";
 import { JsMsg } from "nats";
+import { TicketUpdatedPublisher } from "../../events/publishers/ticket-updated-publisher";
 
 const setup = async () => {
   // Create an instance of the listener
@@ -51,4 +52,18 @@ it("acks the message", async () => {
 
   await listener.onMessage(data, msg);
   expect(msg.ack).toHaveBeenCalled();
+});
+
+it("publishes a ticket updated event", async () => {
+  const { listener, ticket, data, msg } = await setup();
+
+  await listener.onMessage(data, msg);
+
+  expect(natsWrapper.jsClient.publish).toHaveBeenCalled();
+  // @ts-ignore
+  const ticketUpdatedData = JSON.parse(
+    (natsWrapper.jsClient.publish as jest.Mock).mock.calls[0][1]
+  ); // to see the arguments passed to the publish function
+
+  expect(data.id).toEqual(ticketUpdatedData.orderId);
 });
