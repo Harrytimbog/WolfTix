@@ -1,4 +1,5 @@
 import {
+  natsWrapper,
   Publisher,
   Subjects,
   TicketCreatedEvent,
@@ -7,3 +8,7 @@ import {
 export class TicketCreatedPublisher extends Publisher<TicketCreatedEvent> {
   readonly subject = Subjects.TicketCreated;
 }
+
+new TicketUpdatedPublisher(natsWrapper.jsClient).publish({
+  
+});
