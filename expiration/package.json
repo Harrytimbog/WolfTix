@@ -20,7 +20,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@clonedwolftickets/common": "^1.0.12",
+    "@clonedwolftickets/common": "^1.0.43",
     "@types/bull": "^4.10.0",
     "bull": "^4.16.1",
     "nats": "^2.18.1",
