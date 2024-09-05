@@ -1,5 +1,6 @@
 import { OrderStatus } from "@clonedwolftickets/common";
 import mongoose from "mongoose";
+import { updateIfCurrentPlugin } from "mongoose-update-if-current";
 
 interface orderAttrs {
   // list of properties required to create a new order
@@ -49,6 +50,9 @@ const orderSchema = new mongoose.Schema(
     },
   }
 );
+
+orderSchema.set("versionKey", "version");
+orderSchema.plugin(updateIfCurrentPlugin);
 
 orderSchema.statics.build = (attrs: orderAttrs) => {
   return new Order({
