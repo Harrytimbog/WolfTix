@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 
 declare global {
-  var signin: () => string[];
+  var signin: (userId?: string) => string[];
 }
 
 // Mock natsWrapper in your tests
@@ -61,9 +61,11 @@ afterAll(async () => {
 });
 
 // JWT helper function for authentication
-global.signin = () => {
+global.signin = (id?: string) => {
+  // Build a JWT payload { id, email }
   const payload = {
-    id: new mongoose.Types.ObjectId().toHexString(),
+    // If id is provided, use it; otherwise, generate a new ObjectId
+    id: id || new mongoose.Types.ObjectId().toHexString(),
     email: "test@gmail.com",
   };
 
