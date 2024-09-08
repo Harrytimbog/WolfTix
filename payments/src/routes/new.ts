@@ -9,6 +9,7 @@ import {
   NotAuthorizedError,
 } from "@clonedwolftickets/common";
 import { Order } from "../models/order";
+import { stripe } from "../stripe";
 
 const router = express.Router();
 
@@ -33,6 +34,16 @@ router.post(
     if (order.status === OrderStatus.Cancelled) {
       throw new BadRequestError("Cannot pay for cancelled order");
     }
+
+    // Create the charge
+
+    await stripe.charges.create({
+      currency: "usd",
+      // Convert the price to cents
+      amount: order.price * 100,
+      // The token from the client
+      source: token,
+    });
 
     res.send({ success: true });
   }
