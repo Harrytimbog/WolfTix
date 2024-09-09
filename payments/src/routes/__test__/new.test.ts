@@ -4,6 +4,7 @@ import { Order } from "../../models/order";
 import mongoose from "mongoose";
 import { OrderStatus } from "@clonedwolftickets/common";
 import { stripe } from "../../stripe";
+import { Payment } from "../../models/payment";
 
 it("Has a route handler listening to /api/payments/new", async () => {
   const order = Order.build({
@@ -85,7 +86,7 @@ it("returns a 201 with valid inputs", async () => {
     .expect(201);
 
   const stripeCharges = await stripe.charges.list({ limit: 50 });
-  const stripeCharge = stripeCharges!.data.find((charge) => {
+  const stripeCharge = stripeCharges.data.find((charge) => {
     return charge.amount === price * 100;
   });
   // Check if the stripe module was called with the correct arguments
@@ -93,4 +94,12 @@ it("returns a 201 with valid inputs", async () => {
   // Check the amount
   // Check the currency
   expect(stripeCharge!.currency).toEqual("usd");
+
+  // Check if the payment was saved in the database
+  const payment = await Payment.findOne({
+    orderId: order.id,
+    stripeId: stripeCharge!.id,
+  });
+
+  expect(payment).not.toBeNull();
 });

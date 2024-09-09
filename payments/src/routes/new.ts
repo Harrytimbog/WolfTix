@@ -10,6 +10,7 @@ import {
 } from "@clonedwolftickets/common";
 import { Order } from "../models/order";
 import { stripe } from "../stripe";
+import { Payment } from "../models/payment";
 
 const router = express.Router();
 
@@ -37,13 +38,17 @@ router.post(
 
     // Create the charge
 
-    await stripe.charges.create({
+    const charge = await stripe.charges.create({
       currency: "usd",
       // Convert the price to cents
       amount: order.price * 100,
       // The token from the client
       source: token,
     });
+
+    // Save the charge in the database
+    const payment = Payment.build({ orderId, stripeId: charge.id });
+    await payment.save();
 
     res.status(201).send({ success: true });
   }
