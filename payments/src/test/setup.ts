@@ -1,6 +1,7 @@
 import { MongoMemoryServer } from "mongodb-memory-server";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 
 declare global {
   var signin: (userId?: string) => string[];
@@ -19,6 +20,16 @@ jest.mock("../nats-wrapper.ts", () => {
     },
   };
 });
+
+// Testing with real stripe API
+
+dotenv.config();
+
+// set stripe key when in development
+
+if (process.env.NODE_ENV === "development") {
+  process.env.STRIPE_KEY = process.env.STRIPE_KEY;
+}
 
 let mongo: MongoMemoryServer;
 
