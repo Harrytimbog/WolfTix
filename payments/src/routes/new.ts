@@ -11,6 +11,8 @@ import {
 import { Order } from "../models/order";
 import { stripe } from "../stripe";
 import { Payment } from "../models/payment";
+import { PaymentCreatedPublisher } from "../events/publishers/payment-created-publisher";
+import { natsWrapper } from "../nats-wrapper";
 
 const router = express.Router();
 
@@ -50,7 +52,17 @@ router.post(
     const payment = Payment.build({ orderId, stripeId: charge.id });
     await payment.save();
 
-    res.status(201).send({ success: true });
+    // Emit an event that the payment was created
+
+    // did not add await because we don't need to wait for the event to be published
+
+    new PaymentCreatedPublisher(natsWrapper.jsClient).publish({
+      id: payment.id,
+      orderId: payment.orderId,
+      stripeId: payment.stripeId,
+    });
+
+    res.status(201).send({ id: payment.id });
   }
 );
 
