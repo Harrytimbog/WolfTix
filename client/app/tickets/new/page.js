@@ -1,19 +1,61 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
+import useRequest from "@/hooks/use-request";
 
 const NewTicket = () => {
+  const [title, setTitle] = useState("");
+  const [price, setPrice] = useState("");
+  const { doRequest, errors } = useRequest({
+    url: "/api/tickets",
+    method: "post",
+    body: {
+      title,
+      price,
+    },
+    onSuccess: (ticket) => console.log(ticket),
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await doRequest();
+  };
+
+  // onblur event to convert price to number
+  const onBlur = () => {
+    const value = parseFloat(price);
+    // if value is not a number, return
+    if (isNaN(value)) {
+      return;
+    }
+    setPrice(value.toFixed(2));
+  };
+
   return (
     <div>
       <h1>Create a Ticket</h1>
-      <form>
+      <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label>Title</label>
-          <input type="text" className="form-control" />
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="form-control"
+          />
         </div>
         <div className="form-group">
           <label>Price</label>
-          <input type="text" className="form-control" />
+          <input
+            type="text"
+            value={price}
+            onBlur={onBlur}
+            onChange={(e) => setPrice(e.target.value)}
+            className="form-control"
+          />
         </div>
-        <button className="btn btn-primary">Submit</button>
+        <button className="btn btn-primary mt-2">Submit</button>
+        {errors}
       </form>
     </div>
   );

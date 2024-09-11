@@ -1,6 +1,3 @@
-import axios from "axios";
-import { headers } from "next/headers";
-
 export default async function Home() {
   return (
     <main className="container mt-5">

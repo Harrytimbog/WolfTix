@@ -3,10 +3,9 @@
 import React, { useEffect } from "react";
 
 import { useRouter } from "next/navigation"; // Next.js 13+ uses this for navigation
-import { useUser } from "../context/UserContext";
+import wrapCurrentUser from "@/components/hoc/getCurrentUser";
 
-const ProfilePage = () => {
-  const { currentUser } = useUser();
+const ProfilePage = ({ currentUser }) => {
   const router = useRouter();
 
   useEffect(() => {
@@ -27,4 +26,4 @@ const ProfilePage = () => {
   );
 };
 
-export default ProfilePage;
+export default wrapCurrentUser(ProfilePage);
