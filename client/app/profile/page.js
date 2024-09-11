@@ -1,4 +1,7 @@
+"use client";
+
 import React, { useEffect } from "react";
+
 import { useRouter } from "next/navigation"; // Next.js 13+ uses this for navigation
 import { useUser } from "../context/UserContext";
 
