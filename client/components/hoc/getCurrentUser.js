@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@/lib/getCurrentUser";
+import { getCurrentUser } from "@/app/actions/getCurrentUser";
 
 const currentUser = await getCurrentUser();
 

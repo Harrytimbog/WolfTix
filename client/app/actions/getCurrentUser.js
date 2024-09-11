@@ -1,4 +1,4 @@
-import createServerAxios from "./buildAxiosServer";
+import createServerAxios from "@/lib/buildAxiosServer";
 
 export async function getCurrentUser() {
   const axiosServer = createServerAxios();

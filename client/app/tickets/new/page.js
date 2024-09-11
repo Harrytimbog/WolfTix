@@ -2,8 +2,10 @@
 
 import React, { useState } from "react";
 import useRequest from "@/hooks/use-request";
+import { useRouter } from "next/navigation";
 
 const NewTicket = () => {
+  const router = useRouter();
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
   const { doRequest, errors } = useRequest({
@@ -13,7 +15,7 @@ const NewTicket = () => {
       title,
       price,
     },
-    onSuccess: (ticket) => console.log(ticket),
+    onSuccess: () => router.push("/"),
   });
 
   const handleSubmit = async (e) => {
@@ -41,7 +43,7 @@ const NewTicket = () => {
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="form-control"
+            className="form-control mt-2"
           />
         </div>
         <div className="form-group">
