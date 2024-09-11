@@ -10,7 +10,7 @@ import { Order } from "../../models/order";
 
 export class PaymentCreatedListener extends Listener<PaymentCreatedEvent> {
   readonly subject: Subjects.PaymentCreated = Subjects.PaymentCreated;
-  queueGroupName = queueGroupName;
+  queueGroupName = `${queueGroupName}-payment-created`;
 
   async onMessage(data: PaymentCreatedEvent["data"], msg: JsMsg) {
     // find the order that the payment is associated with

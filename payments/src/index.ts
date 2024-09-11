@@ -26,28 +26,23 @@ const start = async () => {
   }
 
   try {
-    // Connect to the NATS streaming server
+    // connecting to the NATS client.
     await natsWrapper.connect(process.env.NATS_URL);
-
-    // Graceful shutdown handling
     process.on("SIGINT", () => natsWrapper.close());
     process.on("SIGTERM", () => natsWrapper.close());
 
-    // Initialize listeners
+    // event listeners
     new OrderCreatedListener(natsWrapper.jsClient).listen();
     new OrderCancelledListener(natsWrapper.jsClient).listen();
 
-    // Connect to MongoDB
-    await mongoose.connect(process.env.MONGO_URI, {});
-    console.log("Connected to MongoDB for tickets service");
-
-    // Start listening for incoming requests
-    app.listen(3000, () => {
-      console.log("Listening on port 3000!");
-    });
-  } catch (err) {
-    console.error(err);
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("[SUCCESSFULLY_CONNECTED_TO_MONGOOSE]");
+  } catch (error) {
+    console.log("[ERROR_CONNECTING_TO_MONGODB/NATS_SERVER]", error);
   }
+  app.listen(3000, () => {
+    console.log("Listening on port 3000!");
+  });
 };
 
 start();

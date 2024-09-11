@@ -10,7 +10,7 @@ import { Order } from "../../models/order";
 
 export class OrderCancelledListener extends Listener<OrderCancelledEvent> {
   readonly subject: Subjects.OrderCancelled = Subjects.OrderCancelled;
-  queueGroupName = queueGroupName;
+  queueGroupName = `${queueGroupName}-order-cancelled`;
 
   async onMessage(data: OrderCancelledEvent["data"], msg: JsMsg) {
     // find the order that was cancelled and update its status

@@ -9,7 +9,7 @@ import { Order } from "../../models/order";
 
 export class OrderCreatedListener extends Listener<OrderCreatedEvent> {
   readonly subject: Subjects.OrderCreated = Subjects.OrderCreated;
-  queueGroupName = queueGroupName;
+  queueGroupName = `${queueGroupName}-order-created`;
 
   async onMessage(data: OrderCreatedEvent["data"], msg: JsMsg) {
     // receive the data from the event and build a new order from it in this service

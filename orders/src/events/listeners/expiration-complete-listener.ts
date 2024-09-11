@@ -11,7 +11,7 @@ import { OrderCancelledPublisher } from "../publishers/order-cancelled-publisher
 
 export class ExpirationCompleteListener extends Listener<ExpirationCompleteEvent> {
   readonly subject: Subjects.ExpirationComplete = Subjects.ExpirationComplete;
-  queueGroupName = queueGroupName;
+  queueGroupName = `${queueGroupName}-expiration-completed`;
 
   async onMessage(data: ExpirationCompleteEvent["data"], msg: JsMsg) {
     const order = await Order.findById(data.orderId).populate("ticket");

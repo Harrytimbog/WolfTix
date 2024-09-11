@@ -2,7 +2,7 @@ import express from "express";
 import "express-async-errors";
 import { json } from "body-parser";
 import cookieSession from "cookie-session";
-import { createChargeRouter } from "./routes/new";
+import { createPaymentRouter } from "./routes/new";
 
 // Routes
 
@@ -29,7 +29,7 @@ app.use(
 // set the current user property on the request object
 app.use(currentUser);
 
-app.use(createChargeRouter);
+app.use(createPaymentRouter);
 
 app.all("*", () => {
   throw new NotFoundError();
