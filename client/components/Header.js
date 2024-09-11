@@ -1,8 +1,7 @@
 import Link from "next/link";
+import wrapCurrentUser from "./hoc/getCurrentUser";
 
-const Header = async ({ getCurrentUser }) => {
-  const { currentUser } = await getCurrentUser();
-  console.log(currentUser);
+const Header = async ({ currentUser }) => {
   const links = [
     !currentUser && { label: "Sign Up", href: "/signup" },
     !currentUser && { label: "Sign In", href: "/signin" },
@@ -31,4 +30,4 @@ const Header = async ({ getCurrentUser }) => {
   );
 };
 
-export default Header;
+export default wrapCurrentUser(Header);

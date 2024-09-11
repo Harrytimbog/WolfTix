@@ -1,4 +1,3 @@
-import createServerAxios from "@/lib/buildAxiosServer";
 import axios from "axios";
 import { headers } from "next/headers";
 

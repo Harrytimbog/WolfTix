@@ -1,44 +1,27 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useRouter } from "next/navigation"; // Next.js 13+ uses this for navigation
+import { useUser } from "../context/UserContext";
 
-import jwt from "jsonwebtoken";
-import { parseCookies } from "nookies";
+const ProfilePage = () => {
+  const { currentUser } = useUser();
+  const router = useRouter();
 
-export async function getServerSideProps(context) {
-  const cookies = parseCookies(context);
-  const token = cookies["session"];
+  useEffect(() => {
+    if (!currentUser) {
+      router.push("/login");
+    }
+  }, [currentUser, router]);
 
-  if (!token) {
-    return {
-      redirect: {
-        destination: "/login",
-        permanent: false,
-      },
-    };
+  if (!currentUser) {
+    return <div>Loading...</div>;
   }
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_KEY);
-
-    return {
-      props: { user: decoded }, // Pass user data to the page component
-    };
-  } catch (err) {
-    return {
-      redirect: {
-        destination: "/login",
-        permanent: false,
-      },
-    };
-  }
-}
-
-const ProfilePage = ({ user }) => {
-  console.log(user);
   return (
     <div>
       <h1>Protected Page</h1>
-      <p>Welcome, {user.email}</p>
+      <p>Welcome, {currentUser.email}</p>
     </div>
   );
 };
+
 export default ProfilePage;
