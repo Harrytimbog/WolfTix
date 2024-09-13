@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getAllTickets } from "./actions/getAllTickets";
 
 export default async function Home() {
@@ -8,7 +9,9 @@ export default async function Home() {
   const ticketList = tickets.map((ticket) => {
     return (
       <tr key={ticket.id}>
-        <td>{ticket.title}</td>
+        <td>
+          <Link href={`/tickets/${ticket.id}`}>{ticket.title}</Link>
+        </td>
         <td>{ticket.price}</td>
       </tr>
     );

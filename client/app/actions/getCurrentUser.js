@@ -1,13 +1,12 @@
 import createServerAxios from "@/lib/buildAxiosServer";
+import { headers } from "next/headers";
 
 export async function getCurrentUser() {
-  const axiosServer = createServerAxios();
+  const requestHeaders = headers(); // Obtain headers from the current request context
+  const axiosServer = createServerAxios(requestHeaders);
 
   try {
-    // Since Next14 components are all server-side components
-    const url = "/api/users/currentUser";
-    const response = await axiosServer.get(url);
-    // console.log(response.data);
+    const response = await axiosServer.get("/api/users/currentuser");
     return response.data;
   } catch (error) {
     console.error("Failed to fetch user data:", error);

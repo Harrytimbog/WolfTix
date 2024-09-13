@@ -2,10 +2,12 @@ import Link from "next/link";
 import wrapCurrentUser from "./hoc/getCurrentUser";
 
 const Header = async ({ currentUser }) => {
+  const loggedInUser = currentUser.currentUser;
+
   const links = [
-    !currentUser && { label: "Sign Up", href: "/signup" },
-    !currentUser && { label: "Sign In", href: "/signin" },
-    currentUser && { label: "Sign Out", href: "/signout" },
+    !loggedInUser && { label: "Sign Up", href: "/signup" },
+    !loggedInUser && { label: "Sign In", href: "/signin" },
+    loggedInUser && { label: "Sign Out", href: "/signout" },
   ]
     .filter((link) => link)
     .map(({ label, href }) => (

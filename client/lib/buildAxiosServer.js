@@ -1,15 +1,12 @@
 "use server";
 
 import axios from "axios";
-import { headers as nextHeaders } from "next/headers";
 
-const createServerAxios = () => {
+const createServerAxios = (headers) => {
   const headersObj = {};
-  const isServer = typeof window === "undefined";
 
-  if (isServer) {
-    // Importing headers within the server check
-    nextHeaders().forEach((value, key) => {
+  if (headers) {
+    headers.forEach((value, key) => {
       headersObj[key] = value;
     });
   }
