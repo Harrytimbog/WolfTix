@@ -9,10 +9,11 @@ export default async function Home() {
   const ticketList = tickets.map((ticket) => {
     return (
       <tr key={ticket.id}>
-        <td>
-          <Link href={`/tickets/${ticket.id}`}>{ticket.title}</Link>
-        </td>
+        <td>{ticket.title}</td>
         <td>{ticket.price}</td>
+        <td>
+          <Link href={`/tickets/${ticket.id}`}>View</Link>
+        </td>
       </tr>
     );
   });
