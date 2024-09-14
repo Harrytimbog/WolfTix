@@ -11,7 +11,7 @@ const SignOut = () => {
     method: "post",
     body: {},
     onSuccess: () => {
-      window.location.href = "/";
+      router.push("/");
     },
   });
 

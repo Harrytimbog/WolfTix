@@ -1,26 +1,16 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import useRequest from "@/hooks/use-request";
 import { useRouter } from "next/navigation";
-import { useUser } from "@/app/context/UserContext";
 
-const SigninForm = () => {
+const SignupForm = () => {
   const router = useRouter();
-  const currentUser = useUser();
-
-  useEffect(() => {
-    // Redirect if user is already signed in
-    if (currentUser) {
-      router.push("/");
-    }
-  }, [currentUser, router]);
-
   // handle form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { doRequest, errors } = useRequest({
-    url: "/api/users/signin",
+    url: "/api/users/signup",
     method: "post",
     body: { email, password },
     onSuccess: () => router.push("/"),
@@ -37,7 +27,7 @@ const SigninForm = () => {
     <div className="container mt-5">
       <div className="row justify-center">
         <div className="col-md-8">
-          <h1 className="text-center">Sign In</h1>
+          <h1 className="text-center">Sign up</h1>
 
           <form onSubmit={handleSubmit}>
             <div className="form-group">
@@ -59,7 +49,7 @@ const SigninForm = () => {
               />
             </div>
             {errors}
-            <button className="btn btn-primary mt-2">Sign In</button>
+            <button className="btn btn-primary mt-2">Sign Up</button>
           </form>
         </div>
       </div>
@@ -67,4 +57,4 @@ const SigninForm = () => {
   );
 };
 
-export default SigninForm;
+export default SignupForm;

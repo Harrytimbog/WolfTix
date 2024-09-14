@@ -28,6 +28,10 @@ export default async function Home() {
         </thead>
         <tbody>{ticketList}</tbody>
       </table>
+
+      <Link href="/tickets/new" className="btn btn-primary">
+        Create Ticket
+      </Link>
     </main>
   );
 }

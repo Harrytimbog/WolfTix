@@ -1,9 +1,7 @@
 import SigninForm from "@/components/signinForm";
-import wrapCurrentUser from "@/components/hoc/getCurrentUser";
 
-const SignInPage = async ({ currentUser }) => {
-  // console.log({ "from signin page": currentUser });
-  return <SigninForm currentUser={currentUser} />;
+const SignInPage = () => {
+  return <SigninForm />;
 };
 
-export default wrapCurrentUser(SignInPage);
+export default SignInPage;

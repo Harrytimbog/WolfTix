@@ -3,8 +3,11 @@
 import React, { useEffect } from "react";
 
 import { useRouter } from "next/navigation"; // Next.js 13+ uses this for navigation
+import { useUser } from "@/app/context/UserContext";
 
-const userProfile = ({ currentUser }) => {
+const userProfile = () => {
+  const { currentUser } = useUser();
+
   const router = useRouter();
 
   useEffect(() => {

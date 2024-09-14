@@ -1,13 +1,15 @@
-import Link from "next/link";
-import wrapCurrentUser from "./hoc/getCurrentUser";
+"use client";
 
-const Header = async ({ currentUser }) => {
-  const loggedInUser = currentUser.currentUser;
+import Link from "next/link";
+import { useUser } from "@/app/context/UserContext";
+
+const Header = () => {
+  const currentUser = useUser();
 
   const links = [
-    !loggedInUser && { label: "Sign Up", href: "/signup" },
-    !loggedInUser && { label: "Sign In", href: "/signin" },
-    loggedInUser && { label: "Sign Out", href: "/signout" },
+    !currentUser && { label: "Sign Up", href: "/signup" },
+    !currentUser && { label: "Sign In", href: "/signin" },
+    currentUser && { label: "Sign Out", href: "/signout" },
   ]
     .filter((link) => link)
     .map(({ label, href }) => (
@@ -32,4 +34,4 @@ const Header = async ({ currentUser }) => {
   );
 };
 
-export default wrapCurrentUser(Header);
+export default Header;

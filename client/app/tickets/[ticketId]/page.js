@@ -1,22 +1,21 @@
-import React from "react";
-import createServerAxios from "@/lib/buildAxiosServer";
 import { headers as nextHeaders } from "next/headers";
-
-const getSingleTicket = async (url, headers) => {
-  const axiosInstance = createServerAxios(headers);
-  return axiosInstance.get(url);
-};
+import { getSingleTicket } from "@/app/actions/getSingleTicket";
 
 const TicketShowPage = async ({ params }) => {
   const { ticketId } = params; // Get the ticketId from the dynamic route
 
-  // Get headers from the server context
-  const headers = nextHeaders();
+  // Get the headers from the request context
+  const requestHeaders = nextHeaders();
 
-  // Fetch the ticket data using the ticketId
+  // Construct the URL for fetching the single ticket
   const url = `/api/tickets/${ticketId}`;
-  const response = await getSingleTicket(url, headers);
-  const ticket = response.data;
+
+  // Fetch the ticket data
+  const ticket = await getSingleTicket(url, requestHeaders);
+
+  if (!ticket) {
+    return <div>Ticket not found</div>;
+  }
 
   return (
     <div>

@@ -1,29 +1,15 @@
-// "use client";
+"use client";
 
-// import { getCurrentUser } from "@/lib/getCurrentUser";
-// import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from "react";
 
-// const UserContext = createContext(); // Create UserContext
+const UserContext = createContext();
 
-// export const UserProvider = ({ children }) => {
-//   const [currentUser, setCurrentUser] = useState(null);
+export const UserProvider = ({ children, initialUser }) => {
+  const [currentUser, setCurrentUser] = useState(initialUser);
 
-//   useEffect(() => {
-//     const fetchUser = async () => {
-//       const user = await getCurrentUser(); // Fetch user data from your API
-//       setCurrentUser(user);
-//     };
+  return (
+    <UserContext.Provider value={currentUser}>{children}</UserContext.Provider>
+  );
+};
 
-//     fetchUser();
-//   }, []);
-
-//   return (
-//     <UserContext.Provider value={{ currentUser }}>
-//       {children}
-//     </UserContext.Provider>
-//   );
-// };
-
-// export const useUser = () => useContext(UserContext); // Export the context and hook
-
-// export { UserContext };
+export const useUser = () => useContext(UserContext);
