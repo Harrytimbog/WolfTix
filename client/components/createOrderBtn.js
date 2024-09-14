@@ -1,15 +1,16 @@
 "use client";
 
 import useRequest from "@/hooks/use-request";
+import { useRouter } from "next/navigation";
 
 const CreateOrderBtn = ({ ticketId }) => {
-  console.log(ticketId);
+  const router = useRouter();
   // Handle order creation
   const { doRequest, errors } = useRequest({
     url: "/api/orders",
     method: "post",
     body: { ticketId: ticketId },
-    onSuccess: (order) => console.log(order),
+    onSuccess: (order) => router.push(`/orders/${order.id}`),
   });
 
   return (
