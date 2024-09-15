@@ -1,5 +1,6 @@
 import { getOrder } from "@/app/actions/getOrder";
 import OrderTimeOut from "@/components/orderTimeOut";
+import StripeCheckoutComponent from "@/components/StripeCheckoutComponent";
 import { headers as nextHeaders } from "next/headers";
 
 const OrderShow = async ({ params }) => {
@@ -24,6 +25,7 @@ const OrderShow = async ({ params }) => {
   return (
     <div>
       <OrderTimeOut order={order} message="seconds until order expires" />
+      <StripeCheckoutComponent order={order} />
     </div>
   );
 };

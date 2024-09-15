@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useUser } from "@/app/context/UserContext";
 
 const Header = () => {
-  const currentUser = useUser();
+  const { currentUser } = useUser();
 
   const links = [
     !currentUser && { label: "Sign Up", href: "/signup" },
