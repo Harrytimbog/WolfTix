@@ -1,9 +1,11 @@
 "use client";
 
 import { useUser } from "@/app/context/UserContext";
+import useRequest from "@/hooks/use-request";
 import StripeCheckout from "react-stripe-checkout";
 
 const StripeCheckoutComponent = ({ order }) => {
+  // Get the Stripe publishable key from the environment variables, I used kubernetes secrets
   const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
   const { currentUser } = useUser();
@@ -13,13 +15,27 @@ const StripeCheckoutComponent = ({ order }) => {
     return <div>Loading...</div>;
   }
 
+  const { doRequest, errors } = useRequest({
+    url: "/api/payments/new",
+    method: "post",
+    body: {
+      orderId: order.id,
+    },
+    onSuccess: (payment) => {
+      console.log(payment);
+    },
+  });
+
   return (
-    <StripeCheckout
-      token={(token) => console.log(token)}
-      stripeKey={stripePublishableKey}
-      amount={order.ticket.price * 100}
-      email={currentUser.email}
-    />
+    <div>
+      <StripeCheckout
+        token={({ id }) => doRequest({ token: id })}
+        stripeKey={stripePublishableKey}
+        amount={order.ticket.price * 100}
+        email={currentUser.email}
+      />
+      {errors}
+    </div>
   );
 };
 

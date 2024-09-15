@@ -5,8 +5,11 @@ export default async function Home() {
   // Fetch all tickets
   const tickets = await getAllTickets();
 
+  // Filter out tickets that have an `orderId`
+  const availableTickets = tickets.filter((ticket) => !ticket.orderId);
+
   // Map over tickets and display them in a table
-  const ticketList = tickets.map((ticket) => {
+  const ticketList = availableTickets.map((ticket) => {
     return (
       <tr key={ticket.id}>
         <td>{ticket.title}</td>

@@ -15,8 +15,8 @@ const CreateOrderBtn = ({ ticketId }) => {
 
   return (
     <div>
-      {errors}
-      <button onClick={doRequest} className="btn btn-primary">
+      <p>{errors}</p>
+      <button onClick={(e) => doRequest()} className="btn btn-primary">
         Purchase
       </button>
     </div>

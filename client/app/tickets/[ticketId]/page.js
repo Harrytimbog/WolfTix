@@ -1,6 +1,7 @@
 import { headers as nextHeaders } from "next/headers";
 import { getSingleTicket } from "@/app/actions/getSingleTicket";
 import CreateOrderBtn from "@/components/createOrderBtn";
+import { sign } from "jsonwebtoken";
 
 const TicketShowPage = async ({ params }) => {
   const { ticketId } = params; // Get the ticketId from the dynamic route
@@ -13,7 +14,7 @@ const TicketShowPage = async ({ params }) => {
 
   // Fetch the ticket data
   const ticket = await getSingleTicket(url, requestHeaders);
-
+  console.log({ "single ticket": ticket });
   if (!ticket) {
     return <div>Ticket not found</div>;
   }
