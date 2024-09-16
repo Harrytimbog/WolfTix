@@ -4,8 +4,12 @@ import { getAllOrders } from "../actions/getAllOrders";
 const OrdersPage = async () => {
   const orders = await getAllOrders();
 
-  if (!orders) {
-    return <h1>You are yet to play any order!</h1>;
+  if (orders.length === 0) {
+    return (
+      <div className="text-center mt-5">
+        <h1>You are yet to place any order!</h1>;
+      </div>
+    );
   }
 
   return (
