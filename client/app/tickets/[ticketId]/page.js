@@ -14,7 +14,6 @@ const TicketShowPage = async ({ params }) => {
 
   // Fetch the ticket data
   const ticket = await getSingleTicket(url, requestHeaders);
-  console.log({ "single ticket": ticket });
   if (!ticket) {
     return <div>Ticket not found</div>;
   }

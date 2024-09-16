@@ -8,8 +8,10 @@ export default ({ url, method, body, onSuccess }) => {
   const doRequest = async (props = {}) => {
     try {
       setErrors(null);
-      const response = await axios[method](url, { ...body, ...props });
-      // if there is a success callback, call it
+      const response = await axios[method](url, {
+        ...body,
+        ...props,
+      }); // if there is a success callback, call it
       if (onSuccess) {
         onSuccess(response.data);
       }

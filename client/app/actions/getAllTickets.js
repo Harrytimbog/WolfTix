@@ -7,7 +7,6 @@ export async function getAllTickets() {
     // Since Next14 components are all server-side components
     const url = "/api/tickets";
     const response = await axiosServer.get(url);
-    // console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Failed to fetch all tickets:", error);

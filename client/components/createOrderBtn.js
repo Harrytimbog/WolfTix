@@ -5,18 +5,22 @@ import { useRouter } from "next/navigation";
 
 const CreateOrderBtn = ({ ticketId }) => {
   const router = useRouter();
-  // Handle order creation
+
   const { doRequest, errors } = useRequest({
     url: "/api/orders",
     method: "post",
-    body: { ticketId: ticketId },
+    body: { ticketId }, // This will be { ticketId: "some_ticket_id" }
     onSuccess: (order) => router.push(`/orders/${order.id}`),
   });
 
+  const handleClick = async () => {
+    await doRequest();
+  };
+
   return (
     <div>
-      <p>{errors}</p>
-      <button onClick={(e) => doRequest()} className="btn btn-primary">
+      {errors && <div className="alert alert-danger">{errors}</div>}
+      <button onClick={handleClick} className="btn btn-primary">
         Purchase
       </button>
     </div>

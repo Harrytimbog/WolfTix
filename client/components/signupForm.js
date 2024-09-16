@@ -3,9 +3,22 @@
 import React, { useState } from "react";
 import useRequest from "@/hooks/use-request";
 import { useRouter } from "next/navigation";
+import { useUser } from "@/app/context/UserContext";
 
 const SignupForm = () => {
   const router = useRouter();
+
+  const { currentUser } = useUser();
+
+  const loggedInUser = currentUser.currentUser;
+
+  useEffect(() => {
+    // Redirect if user is already signed in
+    if (loggedInUser) {
+      router.push("/");
+    }
+  }, [loggedInUser, router]);
+
   // handle form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

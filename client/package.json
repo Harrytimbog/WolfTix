@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clonedwolftickets/common": "^1.0.45",
     "axios": "^1.7.2",
     "bootstrap": "^5.3.3",
     "jsonwebtoken": "^9.0.2",

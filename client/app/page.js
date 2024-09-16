@@ -1,12 +1,31 @@
 import Link from "next/link";
 import { getAllTickets } from "./actions/getAllTickets";
+import { getAllOrders } from "./actions/getAllOrders";
+import { getCurrentUser } from "./actions/getCurrentUser";
+import { OrderStatus } from "@clonedwolftickets/common";
 
 export default async function Home() {
   // Fetch all tickets
   const tickets = await getAllTickets();
+  const { currentUser } = await getCurrentUser();
 
-  // Filter out tickets that have an `orderId`
-  const availableTickets = tickets.filter((ticket) => !ticket.orderId);
+  let availableTickets;
+
+  if (!currentUser) {
+    // If user is not logged in, list all tickets
+    availableTickets = tickets;
+  } else {
+    // Fetch user's orders
+    const orders = await getAllOrders();
+    const completedTicketIds = orders
+      .filter((order) => order.status === OrderStatus.Complete)
+      .map((order) => order.ticket.id);
+
+    // Filter out tickets that have an order with status "Complete"
+    availableTickets = tickets.filter(
+      (ticket) => !completedTicketIds.includes(ticket.id)
+    );
+  }
 
   // Map over tickets and display them in a table
   const ticketList = availableTickets.map((ticket) => {
@@ -20,6 +39,7 @@ export default async function Home() {
       </tr>
     );
   });
+
   return (
     <main className="container mt-5">
       <h1 className="text-center">Tickets</h1>

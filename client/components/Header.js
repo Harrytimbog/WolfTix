@@ -4,11 +4,14 @@ import Link from "next/link";
 import { useUser } from "@/app/context/UserContext";
 
 const Header = () => {
-  const { currentUser } = useUser();
+  const { currentUser, setCurrentUser } = useUser();
 
   const links = [
     !currentUser && { label: "Sign Up", href: "/signup" },
     !currentUser && { label: "Sign In", href: "/signin" },
+    currentUser && { label: "Sell Tickets", href: "/tickets/new" },
+    currentUser && { label: "My Profile", href: "/profile" },
+    currentUser && { label: "My Orders", href: "/orders" },
     currentUser && { label: "Sign Out", href: "/signout" },
   ]
     .filter((link) => link)

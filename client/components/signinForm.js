@@ -7,29 +7,28 @@ import { useUser } from "@/app/context/UserContext";
 
 const SigninForm = () => {
   const router = useRouter();
-  const currentUser = useUser();
+  const { currentUser, setCurrentUser } = useUser();
 
   useEffect(() => {
-    // Redirect if user is already signed in
     if (currentUser) {
       router.push("/");
     }
   }, [currentUser, router]);
 
-  // handle form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { doRequest, errors } = useRequest({
     url: "/api/users/signin",
     method: "post",
     body: { email, password },
-    onSuccess: () => router.push("/"),
+    onSuccess: (user) => {
+      setCurrentUser(user); // Update the user context
+      router.push("/");
+    },
   });
 
-  // handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     await doRequest();
   };
 
@@ -38,7 +37,6 @@ const SigninForm = () => {
       <div className="row justify-center">
         <div className="col-md-8">
           <h1 className="text-center">Sign In</h1>
-
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label>Email Address</label>

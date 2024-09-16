@@ -2,9 +2,11 @@
 
 import { useUser } from "@/app/context/UserContext";
 import useRequest from "@/hooks/use-request";
+import { useRouter } from "next/navigation";
 import StripeCheckout from "react-stripe-checkout";
 
 const StripeCheckoutComponent = ({ order }) => {
+  const router = useRouter();
   // Get the Stripe publishable key from the environment variables, I used kubernetes secrets
   const stripePublishableKey = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
 
@@ -21,8 +23,11 @@ const StripeCheckoutComponent = ({ order }) => {
     body: {
       orderId: order.id,
     },
-    onSuccess: (payment) => {
-      console.log(payment);
+    // onSuccess: (payment) => {
+    //   console.log(payment);
+    // },
+    onSuccess: () => {
+      router.push("/orders");
     },
   });
 

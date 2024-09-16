@@ -19,7 +19,7 @@ const userProfile = () => {
   return (
     <div>
       <h1>Profile Page</h1>
-      <p>Welcome, {currentUser.email}</p>
+      <p>Welcome, {currentUser?.email}</p>
     </div>
   );
 };
