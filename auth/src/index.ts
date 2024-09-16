@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { app } from "./app";
 
 const start = async () => {
+  console.log("Starting up Auth Service...");
   // Check if the JWT_KEY is defined in the environment variables before starting the server
   // this environment variable is set in the auth-depl.yaml file and is set on kubernetes
   if (!process.env.JWT_KEY) {
