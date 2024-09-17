@@ -7,7 +7,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: wolfticketing.dev
+    - host: wolfticketing.prod
       http:
         paths:
           - path: /api/payments/?(.*)
