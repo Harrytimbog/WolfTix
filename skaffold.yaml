@@ -3,6 +3,7 @@ kind: Config
 manifests:
   rawYaml:
     - ./infra/k8s/*
+    - ./infra/k8s-dev/*
 build:
   local:
     push: false # This is to disable an image being push to docker hub on build or rebuild. since skaffhold will handle all of that
