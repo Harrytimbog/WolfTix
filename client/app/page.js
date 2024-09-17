@@ -42,7 +42,7 @@ export default async function Home() {
 
   return (
     <main className="container mt-5">
-      <h1 className="text-center">Tickets</h1>
+      <h2 className="text-center">Tickets</h2>
       <table className="table">
         <thead>
           <tr>
