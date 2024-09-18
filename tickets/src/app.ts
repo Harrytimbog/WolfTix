@@ -25,7 +25,8 @@ app.use(json());
 // Disable the secure flag for the cookie session because this services might be needed
 // to be accessed from other services that are written in different languages
 app.use(
-  cookieSession({ signed: false, secure: process.env.NODE_ENV !== "test" })
+  // cookieSession({ signed: false, secure: process.env.NODE_ENV !== "test" }) // I used in development mode
+  cookieSession({ signed: false, secure: false }) // I used in production mode before I had HTTPS set up so it doesn't break
 );
 
 // Route handlers

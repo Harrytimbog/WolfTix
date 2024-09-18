@@ -12,10 +12,11 @@ const createServerAxios = (headers) => {
   }
 
   return axios.create({
-    baseURL: "http://ingress-nginx-controller.ingress-nginx.svc.cluster.local",
+    // baseURL: "http://ingress-nginx-controller.ingress-nginx.svc.cluster.local", // I used in development
+    baseURL: "http://clonedwolf-ticketing-app.site",
     headers: {
       ...headersObj,
-      Host: "wolfticketing.dev",
+      Host: "www.clonedwolf-ticketing-app.site",
     },
   });
 };
